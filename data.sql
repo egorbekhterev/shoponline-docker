@@ -1,0 +1,2 @@
+INSERT INTO public.inventory (id, price, weight, size, category, brand, in_stock, creation_date) VALUES ('10e29860-11b7-4e75-8ef5-b52c31b2e071', 55555.5500, 55.5, 'XL', 'COMPUTERS', 'APPLE', 5, '2023-03-27 13:09:53.594000');
+INSERT INTO public.inventory (id, price, weight, size, category, brand, in_stock, creation_date) VALUES ('c0a800d8-88bd-1909-8188-bd791b870000', 1.0000, 1, 'L', 'COMPUTERS', 'SAMSUNG', 1, '2023-06-15 05:11:41.520000');
