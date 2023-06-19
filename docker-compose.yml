@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3.8'
 services:
   database:
     image: postgres:latest
@@ -69,7 +69,7 @@ services:
       backend:
         aliases:
           - "gateway"
-#  zookeeper:
+  #  zookeeper:
 #    image: wurstmeister/zookeeper:latest
 #    container_name: zookeeper
 #    ports:
@@ -125,7 +125,10 @@ services:
       - "8080:8080"
     networks:
       - backend
-#  organizationservice:
+    labels:
+      - collect_logs_with_filebeat=true
+      - decode_log_event_to_json_object=true
+  #  organizationservice:
 #    image: ostock/organization-service:0.0.1-SNAPSHOT
 #    container_name: organization-service
 #    environment:
@@ -178,18 +181,39 @@ services:
 #      backend:
 #        aliases:
 #          - "kibana"
-#  logstash:
-#    image: docker.elastic.co/logstash/logstash:7.7.0
-#    container_name: logstash
-#    command: logstash -f /etc/logstash/conf.d/logstash.conf
-#    volumes:
-#      - ./config:/etc/logstash/conf.d
-#    ports:
-#      - "5000:5000"
-#    networks:
-#      backend:
-#        aliases:
-#          - "logstash"
+  filebeat:
+    image: elastic/filebeat:7.14.0
+    container_name: filebeat
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - ./config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/filebeat/data:/usr/share/filebeat/data
+      - ./config/input.log:/etc/filebeat/input.log
+    user: root
+    depends_on:
+      - logstash
+    networks:
+      backend:
+        aliases:
+          - "filebeat"
+  logstash:
+    image: logstash:7.14.0
+    container_name: logstash
+    ports:
+      - "5044:5044"
+      - "5045:5045"
+      - "9600:9600"
+    volumes:
+      - ./config/logstash.conf:/etc/logstash/conf.d/logstash.conf
+    command: logstash -f /etc/logstash/conf.d/logstash.conf
+    environment:
+     - XPACK_MONITORING_ENABLED=false
+    networks:
+      backend:
+        aliases:
+          - "logstash"
 #  zipkin:
 #    image: openzipkin/zipkin
 #    container_name: zipkin
