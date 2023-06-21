@@ -206,8 +206,8 @@ services:
       - "5045:5045"
       - "9600:9600"
     volumes:
-      - ./config/logstash.conf:/etc/logstash/conf.d/logstash.conf
-    command: logstash -f /etc/logstash/conf.d/logstash.conf
+      - ./config/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
     environment:
      - XPACK_MONITORING_ENABLED=false
     networks:
